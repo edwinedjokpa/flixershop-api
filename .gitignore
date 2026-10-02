@@ -3,6 +3,9 @@
 /node_modules
 /build
 
+# generated database migrations
+/drizzle
+
 # TypeScript build cache
 *.tsbuildinfo
 
