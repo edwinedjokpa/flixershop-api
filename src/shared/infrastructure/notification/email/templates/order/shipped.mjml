@@ -1,0 +1,110 @@
+<mjml>
+  <mj-head>
+    <mj-title> Your Order Has Shipped — {{appName}} </mj-title>
+    <mj-attributes>
+      <mj-all font-family="Arial, Helvetica, sans-serif" color="#172033" />
+      <mj-text font-size="16px" line-height="1.6" />
+      <mj-section padding="0" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f1f5f9">
+    <!-- Header -->
+    <mj-section background-color="#0F52BA" padding="24px 40px">
+      <mj-column>
+        <mj-text
+          align="center"
+          color="#ffffff"
+          font-size="24px"
+          font-weight="700"
+          padding="0"
+        >
+          {{appName}}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <!-- Main content -->
+    <mj-section background-color="#ffffff" padding="48px 40px 24px">
+      <mj-column>
+        <mj-text
+          font-size="30px"
+          font-weight="700"
+          color="#172033"
+          padding="0 0 20px"
+        >
+          Your order is on its way! 📦
+        </mj-text>
+        <mj-text color="#475569" padding="0 0 28px">
+          Great news! Your order
+          <strong> #{{ orderId }} </strong>
+          has been shipped and is on its way to you.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <!-- Tracking information -->
+    <mj-section background-color="#f8fafc" border-radius="6px" padding="24px">
+      <mj-column>
+        <mj-text
+          align="center"
+          font-size="13px"
+          font-weight="700"
+          color="#64748b"
+          padding="0 0 8px"
+        >
+          TRACKING NUMBER
+        </mj-text>
+        <mj-text
+          align="center"
+          font-size="22px"
+          font-weight="700"
+          color="#0F52BA"
+          padding="0"
+        >
+          {{ trackingNumber }}
+        </mj-text>
+        <mj-text color="#475569" padding="28px 0 0">
+          Keep your tracking number handy so you can follow the progress of your
+          shipment.
+        </mj-text>
+        <mj-button
+          background-color="#0F52BA"
+          color="#ffffff"
+          font-size="16px"
+          font-weight="700"
+          border-radius="6px"
+          inner-padding="14px 28px"
+          padding="24px 0 0"
+          href="{{appUrl}}"
+        >
+          View Your Order
+        </mj-button>
+      </mj-column>
+    </mj-section>
+    <!-- Closing -->
+    <mj-section background-color="#ffffff" padding="0 40px 48px">
+      <mj-column>
+        <mj-divider border-color="#e2e8f0" padding="24px 0" />
+        <mj-text color="#475569" padding="0 0 8px">
+          Thank you for shopping with {{appName}}!
+        </mj-text>
+        <mj-text color="#475569" padding="0"> — The {{appName}} Team </mj-text>
+      </mj-column>
+    </mj-section>
+    <!-- Footer -->
+    <mj-section padding="24px 40px">
+      <mj-column>
+        <mj-text
+          align="center"
+          color="#64748b"
+          font-size="13px"
+          padding="0 0 6px"
+        >
+          © {{ year }} {{appName}}. All rights reserved.
+        </mj-text>
+        <mj-text align="center" color="#94a3b8" font-size="12px" padding="0">
+          You're receiving this email because you placed an order with Flixer
+          Shop.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

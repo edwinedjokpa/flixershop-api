@@ -1,0 +1,146 @@
+<mjml>
+  <mj-head>
+    <mj-title> Order Ready to Ship — {{appName}} </mj-title>
+    <mj-attributes>
+      <mj-all font-family="Arial, Helvetica, sans-serif" color="#172033" />
+      <mj-text font-size="16px" line-height="1.6" />
+      <mj-section padding="0" />
+    </mj-attributes>
+    <mj-style>
+      .footer-link { color: #64748b !important; text-decoration: none; }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f1f5f9">
+    <!-- Header -->
+    <mj-section background-color="#0F52BA" padding="24px 40px">
+      <mj-column>
+        <mj-text
+          align="center"
+          color="#ffffff"
+          font-size="24px"
+          font-weight="700"
+          padding="0"
+        >
+          {{appName}}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Main content -->
+    <mj-section background-color="#ffffff" padding="48px 40px 24px">
+      <mj-column>
+        <mj-text
+          font-size="30px"
+          font-weight="700"
+          color="#172033"
+          padding="0 0 20px"
+        >
+          Order ready to ship
+        </mj-text>
+        <mj-text color="#475569" padding="0 0 28px">
+          Order
+          <strong> #{{orderId}} </strong>
+          has been confirmed and is ready for shipment.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Order details -->
+    <mj-section
+      background-color="#f8fafc"
+      border-radius="6px"
+      padding="48px 40px 24px"
+    >
+      <mj-column>
+        <mj-text
+          font-size="13px"
+          font-weight="700"
+          color="#64748b"
+          padding="0 0 6px"
+        >
+          ORDER ID
+        </mj-text>
+        <mj-text
+          font-size="18px"
+          font-weight="700"
+          color="#172033"
+          padding="0 0 16px"
+        >
+          {{orderId}}
+        </mj-text>
+        <mj-text
+          font-size="13px"
+          font-weight="700"
+          color="#64748b"
+          padding="0 0 6px"
+        >
+          CUSTOMER ID
+        </mj-text>
+        <mj-text font-size="16px" color="#172033" padding="0">
+          {{customerId}}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Shipping address -->
+    <mj-section
+      background-color="#f8fafc"
+      border-radius="6px"
+      padding="48px 40px 24px"
+    >
+      <mj-column>
+        <mj-text
+          font-size="20px"
+          font-weight="700"
+          color="#172033"
+          padding="32px 0 16px"
+        >
+          Shipping address
+        </mj-text>
+
+        <mj-text color="#475569" padding="0 0 6px">
+          {{shippingAddress.street}}
+        </mj-text>
+        <mj-text color="#475569" padding="0 0 6px">
+          {{shippingAddress.city}}, {{shippingAddress.state}}
+          {{shippingAddress.zipCode}}
+        </mj-text>
+        <mj-text color="#475569" padding="0">
+          {{shippingAddress.country}}
+        </mj-text>
+
+        <mj-button
+          background-color="#0F52BA"
+          color="#ffffff"
+          font-size="16px"
+          font-weight="700"
+          border-radius="6px"
+          inner-padding="14px 28px"
+          padding="28px 0 0"
+          href="{{appUrl}}"
+        >
+          View Order
+        </mj-button>
+      </mj-column>
+    </mj-section>
+    <!-- Action -->
+
+    <!-- Footer -->
+    <mj-section padding="24px 40px">
+      <mj-column>
+        <mj-divider border-color="#e2e8f0" padding="24px 0" />
+        <mj-text
+          align="center"
+          color="#64748b"
+          font-size="13px"
+          padding="0 0 6px"
+        >
+          © {{year}} {{appName}}. All rights reserved.
+        </mj-text>
+        <mj-text align="center" color="#94a3b8" font-size="12px" padding="0">
+          This is an automated order notification.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
