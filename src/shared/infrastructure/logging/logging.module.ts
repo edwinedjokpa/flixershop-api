@@ -3,24 +3,23 @@ import { LoggerModule } from 'nestjs-pino';
 
 import { appConfig } from '@/config/app-config.js';
 
+const isProduction = appConfig.nodeEnv === 'production';
+
 @Module({
   imports: [
     LoggerModule.forRoot({
       pinoHttp: {
-        level: appConfig.nodeEnv === 'development' ? 'debug' : 'info',
-        transport:
-          appConfig.nodeEnv === 'development'
-            ? {
-                target: 'pino-pretty',
-                options: {
-                  colorize: true,
-                  singleLine: true,
-                },
-              }
-            : undefined,
-
+        level: isProduction ? 'info' : 'debug',
+        transport: isProduction
+          ? undefined
+          : {
+              target: 'pino-pretty',
+              options: {
+                colorize: true,
+                singleLine: true,
+              },
+            },
         redact: ['req.headers.authorization', 'req.headers.cookie'],
-
         serializers: {
           req: (req) => ({
             method: req.method,

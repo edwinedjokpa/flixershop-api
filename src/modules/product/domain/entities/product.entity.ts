@@ -97,7 +97,7 @@ export class Product extends AggregateRoot {
   }
 
   get basePrice(): Money {
-    return this.basePrice;
+    return this._basePrice;
   }
 
   get stock(): number {
