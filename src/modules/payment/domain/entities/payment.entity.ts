@@ -12,7 +12,7 @@ import { PaymentProvider } from '../value-objects/payment-provider.vo.js';
 export interface PaymentProps {
   id: PaymentId;
   orderId: string;
-  amount: Money;
+  money: Money;
   status: PaymentStatus;
   provider: PaymentProvider;
   providerTransactionId: string | null;
@@ -22,14 +22,14 @@ export interface PaymentProps {
 
 interface InitiatePaymentProps {
   orderId: string;
-  amount: Money;
+  money: Money;
   provider: string;
 }
 
 export class Payment extends AggregateRoot {
   private _id: PaymentId;
   private _orderId: string;
-  private _amount: Money;
+  private _money: Money;
   private _status: PaymentStatus;
   private _provider: PaymentProvider;
   private _providerTransactionId: string | null;
@@ -40,7 +40,7 @@ export class Payment extends AggregateRoot {
     super();
     this._id = props.id;
     this._orderId = props.orderId;
-    this._amount = props.amount;
+    this._money = props.money;
     this._status = props.status;
     this._provider = props.provider;
     this._providerTransactionId = props.providerTransactionId;
@@ -48,21 +48,16 @@ export class Payment extends AggregateRoot {
     this._updatedAt = props.updatedAt;
   }
 
-  static initiate({
-    orderId,
-    amount,
-    provider,
-  }: InitiatePaymentProps): Payment {
-    const parsedAmount = amount.amount.toNumber();
-    if (parsedAmount <= 0) {
-      throw new InvalidPaymentAmountException(parsedAmount);
+  static initiate({ orderId, money, provider }: InitiatePaymentProps): Payment {
+    if (money.amount.isNegative()) {
+      throw new InvalidPaymentAmountException(Number(money.amount.toString()));
     }
 
     const now = new Date();
     return new Payment({
       id: new PaymentId(),
       orderId,
-      amount,
+      money,
       status: PaymentStatus.pending(),
       provider: PaymentProvider.create(provider),
       providerTransactionId: null,
@@ -110,8 +105,8 @@ export class Payment extends AggregateRoot {
     return this._orderId;
   }
 
-  get amount(): Money {
-    return this._amount;
+  get money(): Money {
+    return this._money;
   }
 
   get status(): PaymentStatus {

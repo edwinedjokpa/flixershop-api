@@ -44,17 +44,7 @@ export class DrizzleOrderRepository implements OrderRepository {
         .onConflictDoUpdate({
           target: orders.id,
           set: {
-            status: orderRow.status,
-            totalAmount: orderRow.totalAmount,
-            totalCurrency: orderRow.totalCurrency,
-            shippingStreet: orderRow.shippingStreet,
-            shippingCity: orderRow.shippingCity,
-            shippingState: orderRow.shippingState,
-            shippingZipCode: orderRow.shippingZipCode,
-            shippingCountry: orderRow.shippingCountry,
-            trackingNumber: orderRow.trackingNumber,
-            notes: orderRow.notes,
-            updatedAt: orderRow.updatedAt,
+            ...orderRow,
           },
         });
 
@@ -65,12 +55,7 @@ export class DrizzleOrderRepository implements OrderRepository {
           .onConflictDoUpdate({
             target: orderItems.id,
             set: {
-              productName: itemRow.productName,
-              unitPriceAmount: itemRow.unitPriceAmount,
-              unitPriceCurrency: itemRow.unitPriceCurrency,
-              quantity: itemRow.quantity,
-              discountAmount: itemRow.discountAmount,
-              discountCurrency: itemRow.discountCurrency,
+              ...itemRow,
             },
           });
       }
@@ -159,7 +144,7 @@ export class DrizzleOrderRepository implements OrderRepository {
       id: order.id.value,
       customerId: order.customerId,
       status: order.status.value,
-      totalAmount: order.total.toMinorUnits(),
+      totalAmountMinor: order.total.toMinorUnits(),
       totalCurrency: order.total.currency.value,
       shippingStreet: order.shippingAddress.street,
       shippingCity: order.shippingAddress.city,

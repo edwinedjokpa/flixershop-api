@@ -18,11 +18,11 @@ import {
   MongoInt,
   toBigInt,
 } from '@/shared/infrastructure/database/mongodb/mongo-int.util.js';
+import { OrderStatusName } from '../../domain/constants/order.constants.js';
 
-type OrderStatusData =
-  'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+type OrderStatusData = OrderStatusName;
 
-type MoneyData = { amount: MongoInt; currency: string };
+type MoneyData = { amountMinor: MongoInt; currency: string };
 
 type ShippingAddressData = {
   street: string;
@@ -148,13 +148,13 @@ export class MongoOrderRepository implements OrderRepository {
           productId: item.productId,
           productName: item.productName,
           unitPrice: Money.fromMinorUnits(
-            toBigInt(item.unitPrice.amount),
+            toBigInt(item.unitPrice.amountMinor),
             item.unitPrice.currency,
           ),
           quantity: item.quantity,
           discount: item.discount
             ? Money.fromMinorUnits(
-                toBigInt(item.discount.amount),
+                toBigInt(item.discount.amountMinor),
                 item.discount.currency,
               )
             : null,
@@ -192,7 +192,7 @@ export class MongoOrderRepository implements OrderRepository {
       trackingNumber: order.trackingNumber?.value ?? null,
       notes: order.notes,
       total: {
-        amount: Long.fromBigInt(order.total.toMinorUnits()),
+        amountMinor: Long.fromBigInt(order.total.toMinorUnits()),
         currency: order.total.currency.value,
       },
       items: order.items.map((item) => ({
@@ -201,13 +201,13 @@ export class MongoOrderRepository implements OrderRepository {
         productId: item.productId,
         productName: item.productName,
         unitPrice: {
-          amount: Long.fromBigInt(item.unitPrice.toMinorUnits()),
+          amountMinor: Long.fromBigInt(item.unitPrice.toMinorUnits()),
           currency: item.unitPrice.currency.value,
         },
         quantity: item.quantity,
         discount: item.discount
           ? {
-              amount: Long.fromBigInt(item.discount.toMinorUnits()),
+              amountMinor: Long.fromBigInt(item.discount.toMinorUnits()),
               currency: item.discount.currency.value,
             }
           : null,

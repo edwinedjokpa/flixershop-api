@@ -31,14 +31,7 @@ export class DrizzleProductRepository implements ProductRepository {
       .onConflictDoUpdate({
         target: products.id,
         set: {
-          name: data.name,
-          description: data.description,
-          sku: data.sku,
-          basePriceAmount: data.basePriceAmount,
-          basePriceCurrency: data.basePriceCurrency,
-          stock: data.stock,
-          isActive: data.isActive,
-          lowStockThreshold: data.lowStockThreshold,
+          ...data,
         },
       });
   }
@@ -94,11 +87,11 @@ export class DrizzleProductRepository implements ProductRepository {
         : undefined;
 
     if (minPrice !== undefined) {
-      conditions.push(gte(products.basePriceAmount, minPrice));
+      conditions.push(gte(products.basePriceAmountMinor, minPrice));
     }
 
     if (maxPrice !== undefined) {
-      conditions.push(lte(products.basePriceAmount, maxPrice));
+      conditions.push(lte(products.basePriceAmountMinor, maxPrice));
     }
 
     const rows =
@@ -123,7 +116,7 @@ export class DrizzleProductRepository implements ProductRepository {
       description: row.description,
       sku: Sku.create(row.sku),
       basePrice: Money.fromMinorUnits(
-        row.basePriceAmount,
+        row.basePriceAmountMinor,
         row.basePriceCurrency,
       ),
       stock: row.stock,
@@ -140,7 +133,7 @@ export class DrizzleProductRepository implements ProductRepository {
       name: product.name,
       description: product.description,
       sku: product.sku.value,
-      basePriceAmount: product.basePrice.toMinorUnits(),
+      basePriceAmountMinor: product.basePrice.toMinorUnits(),
       basePriceCurrency: product.basePrice.currency.value,
       stock: product.stock,
       isActive: product.isActive,

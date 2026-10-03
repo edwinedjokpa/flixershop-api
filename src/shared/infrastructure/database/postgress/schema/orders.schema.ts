@@ -2,14 +2,9 @@ import { pgTable, pgEnum } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { customers } from './customer.schema.js';
 import { products } from './product.schema.js';
+import { ORDER_STATUSES } from '@/modules/order/domain/constants/order.constants.js';
 
-export const orderStatusEnum = pgEnum('order_status', [
-  'pending',
-  'confirmed',
-  'shipped',
-  'delivered',
-  'cancelled',
-]);
+export const orderStatusEnum = pgEnum('order_status', ORDER_STATUSES);
 
 export const orders = pgTable('orders', (t) => ({
   id: t.uuid('id').primaryKey(),
@@ -18,7 +13,9 @@ export const orders = pgTable('orders', (t) => ({
     .notNull()
     .references(() => customers.id),
   status: orderStatusEnum('status').notNull().default('pending'),
-  totalAmount: t.bigint('total_amount', { mode: 'bigint' }).notNull(),
+  totalAmountMinor: t
+    .bigint('total_amount_minor', { mode: 'bigint' })
+    .notNull(),
   totalCurrency: t.varchar('total_currency', { length: 3 }).notNull(),
   shippingStreet: t.varchar('shipping_street').notNull(),
   shippingCity: t.varchar('shipping_city').notNull(),

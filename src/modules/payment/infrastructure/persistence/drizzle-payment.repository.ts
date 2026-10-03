@@ -31,12 +31,7 @@ export class DrizzlePaymentRepository implements PaymentRepository {
       .onConflictDoUpdate({
         target: payments.id,
         set: {
-          provider: row.provider,
-          providerTransactionId: row.providerTransactionId,
-          status: row.status,
-          amount: row.amount,
-          currency: row.currency,
-          updatedAt: row.updatedAt,
+          ...row,
         },
       });
   }
@@ -63,7 +58,7 @@ export class DrizzlePaymentRepository implements PaymentRepository {
     return Payment.reconstitute({
       id: new PaymentId(row.id),
       orderId: row.orderId,
-      amount: Money.fromMinorUnits(row.amount, row.currency),
+      money: Money.fromMinorUnits(row.moneyAmount, row.moneyCurrency),
       status: PaymentStatus.fromString(row.status),
       provider: PaymentProvider.create(row.provider),
       providerTransactionId: row.providerTransactionId,
@@ -76,8 +71,8 @@ export class DrizzlePaymentRepository implements PaymentRepository {
     return {
       id: payment.id.value,
       orderId: payment.orderId,
-      amount: payment.amount.toMinorUnits(),
-      currency: payment.amount.currency.value,
+      moneyAmount: payment.money.toMinorUnits(),
+      moneyCurrency: payment.money.currency.value,
       status: payment.status.value,
       provider: payment.provider.value,
       providerTransactionId: payment.providerTransactionId,

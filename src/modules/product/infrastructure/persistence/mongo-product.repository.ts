@@ -14,7 +14,7 @@ import {
   toBigInt,
 } from '@/shared/infrastructure/database/mongodb/mongo-int.util.js';
 
-type ProductPriceData = { amount: MongoInt; currency: string };
+type ProductPriceData = { amountMinor: MongoInt; currency: string };
 
 interface ProductDocument {
   _id: string;
@@ -105,7 +105,7 @@ export class MongoProductRepository implements ProductRepository {
       description: doc.description,
       sku: Sku.create(doc.sku),
       basePrice: Money.fromMinorUnits(
-        doc.basePrice.amount.toString(),
+        doc.basePrice.amountMinor.toString(),
         doc.basePrice.currency,
       ),
       stock: doc.stock,
@@ -123,7 +123,7 @@ export class MongoProductRepository implements ProductRepository {
       description: product.description,
       sku: product.sku.value,
       basePrice: {
-        amount: toBigInt(product.basePrice.toMinorUnits()),
+        amountMinor: toBigInt(product.basePrice.toMinorUnits()),
         currency: product.basePrice.currency.value,
       },
       stock: product.stock,

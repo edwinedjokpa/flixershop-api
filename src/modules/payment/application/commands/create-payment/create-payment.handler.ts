@@ -71,7 +71,7 @@ export class CreatePaymentHandler implements ICommandHandler<
       payment = this.eventPublisher.mergeObjectContext(
         Payment.initiate({
           orderId: props.orderId,
-          amount: pricing.total,
+          money: pricing.total,
           provider: props.provider,
         }),
       );

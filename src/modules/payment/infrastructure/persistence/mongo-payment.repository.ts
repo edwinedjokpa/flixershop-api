@@ -12,12 +12,12 @@ import {
 } from '@/shared/infrastructure/database/mongodb/mongo-int.util.js';
 import { PaymentProvider } from '../../domain/value-objects/payment-provider.vo.js';
 
-type MoneyData = { amount: MongoInt; currency: string };
+type MoneyData = { amountMinor: MongoInt; currency: string };
 
 interface PaymentDocument {
   _id: string;
   orderId: string;
-  amount: MoneyData;
+  money: MoneyData;
   status: string;
   provider: string;
   providerTransactionId: string | null;
@@ -64,9 +64,9 @@ export class MongoPaymentRepository implements PaymentRepository {
     return Payment.reconstitute({
       id: new PaymentId(doc._id),
       orderId: doc.orderId,
-      amount: Money.fromMinorUnits(
-        toBigInt(doc.amount.amount),
-        doc.amount.currency,
+      money: Money.fromMinorUnits(
+        toBigInt(doc.money.amountMinor),
+        doc.money.currency,
       ),
       status: PaymentStatus.fromString(doc.status),
       provider: PaymentProvider.create(doc.provider),
@@ -80,9 +80,9 @@ export class MongoPaymentRepository implements PaymentRepository {
     return {
       _id: payment.id.value,
       orderId: payment.orderId,
-      amount: {
-        amount: Long.fromBigInt(payment.amount.toMinorUnits()),
-        currency: payment.amount.currency.value,
+      money: {
+        amountMinor: Long.fromBigInt(payment.money.toMinorUnits()),
+        currency: payment.money.currency.value,
       },
       status: payment.status.value,
       provider: payment.provider.value,

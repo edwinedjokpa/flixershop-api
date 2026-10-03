@@ -1,6 +1,6 @@
 # Flixer Shop API
 
-A NestJS e-commerce backend that demonstrates Clean Architecture, Domain-Driven Design (DDD), CQRS, domain events, and ports/adapters. It manages customers, wallets, products, orders, and checkout payments while keeping business rules independent of HTTP, databases, email, and payment providers.
+A NestJS e-commerce backend that demonstrates Clean Architecture, Domain-Driven Design (DDD), CQRS, domain events, and Hexagonal Architecture (ports & adapters). It manages customers, wallets, products, orders, and checkout payments while keeping business rules independent of HTTP, databases, email, and payment providers.
 
 It supports MongoDB or PostgreSQL persistence at runtime. PostgreSQL uses Drizzle ORM and migrations; MongoDB uses the native MongoDB driver. Redis caches exchange rates and Monnify access tokens.
 
@@ -126,7 +126,7 @@ pnpm db:studio
 
 The PostgreSQL schema includes `customers`, `wallets`, `products`, `orders`, `order_items`, and `payments`, plus order/payment/wallet status enums and foreign keys. MongoDB collections are created on first write; the wallet repository creates a unique customer-and-currency index at module initialization.
 
-Money is stored internally in minor units (for example, `1099` for `10.99`) in both persistence implementations. API product prices are numbers; order monetary fields in response DTOs are strings to preserve exact decimal values.
+Money is stored internally in minor units (for example, `1099` for `10.99`) in both persistence implementations. PostgreSQL and Mongo persistence names these values explicitly with `*_minor` fields (for example, `total_amount_minor`, `base_price_amount_minor`, and `money_amount`); the payment aggregate exposes its monetary value as `money`. API product prices are numbers; order monetary fields in response DTOs are strings to preserve exact decimal values.
 
 ## Architecture
 
@@ -218,7 +218,7 @@ POST /customers
 
 ### Wallets
 
-Wallet endpoints are customer-scoped. Send the `X-Customer-Id` request header with the authenticated customer's UUID; without it, the API returns `CUSTOMER_ID_REQUIRED` (400).
+Wallet endpoints are customer-scoped. For now, send the customer's UUID in the `X-Customer-Id` request header; without it, the API returns `CUSTOMER_ID_REQUIRED` (400). This header is a deliberate temporary stand-in for authenticated identity: authentication and authorization are outside this project's current scope, which is focused on DDD, Clean Architecture, and Hexagonal Architecture.
 
 | Method and path           | Header/body                              | Status | Description                                                         |
 | ------------------------- | ---------------------------------------- | ------ | ------------------------------------------------------------------- |
