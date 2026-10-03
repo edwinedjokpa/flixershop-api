@@ -1,5 +1,6 @@
 export interface CustomerRegisteredEventProps {
   customerId: string;
+  currency: string;
   email: string;
   firstName: string;
 }

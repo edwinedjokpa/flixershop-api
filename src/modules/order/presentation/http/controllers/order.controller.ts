@@ -24,6 +24,7 @@ import { ConfirmOrderCommand } from '@/modules/order/application/commands/confir
 import { CancelOrderCommand } from '@/modules/order/application/commands/cancel-order/cancel-order.command.js';
 import { CancelOrderDto } from '../dto/cancel-order.dto.js';
 import { DeliverOrderCommand } from '@/modules/order/application/commands/deliver-order/deliver-order.command.js';
+import { CustomerId } from '@/common/decorators/customer-id.decorator.js';
 
 @Controller({ path: 'orders' })
 export class OrderController {
@@ -35,10 +36,13 @@ export class OrderController {
   @Post()
   @HttpCode(201)
   @ApiMessage('Order placed successfully')
-  async placeOrder(@Body() dto: PlaceOrderDto) {
+  async placeOrder(
+    @CustomerId() customerId: string,
+    @Body() dto: PlaceOrderDto,
+  ) {
     return this.commandBus.execute(
       new PlaceOrderCommand({
-        customerId: dto.customerId,
+        customerId,
         items: dto.items.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,

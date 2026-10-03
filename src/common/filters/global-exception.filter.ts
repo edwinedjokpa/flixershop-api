@@ -161,11 +161,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       case ApplicationExceptionStatus.VALIDATION_ERROR:
         return HttpStatus.BAD_REQUEST;
 
+      case ApplicationExceptionStatus.BAD_REQUEST:
+        return HttpStatus.BAD_REQUEST;
+
+      case ApplicationExceptionStatus.BAD_GATEWAY:
+        return HttpStatus.BAD_GATEWAY;
+
       case ApplicationExceptionStatus.NOT_FOUND:
         return HttpStatus.NOT_FOUND;
 
       case ApplicationExceptionStatus.CONFLICT:
         return HttpStatus.CONFLICT;
+
+      case ApplicationExceptionStatus.INTERNAL_SERVER_ERROR:
+        return HttpStatus.INTERNAL_SERVER_ERROR;
 
       default:
         return HttpStatus.INTERNAL_SERVER_ERROR;

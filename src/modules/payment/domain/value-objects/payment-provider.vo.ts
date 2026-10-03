@@ -1,4 +1,7 @@
-import { PaymentProviderName } from '../constants/payment-provider.constants.js';
+import {
+  PAYMENT_PROVIDERS,
+  PaymentProviderName,
+} from '../constants/payment.constants.js';
 import { UnsupportedPaymentProviderException } from '../exceptions/payment-gateway.exception.js';
 
 export class PaymentProvider {
@@ -23,6 +26,8 @@ export class PaymentProvider {
   }
 
   private static isProviderName(value: string): value is PaymentProviderName {
-    return (Object.values(PaymentProviderName) as string[]).includes(value);
+    return (Object.values(PAYMENT_PROVIDERS) as readonly string[]).includes(
+      value,
+    );
   }
 }

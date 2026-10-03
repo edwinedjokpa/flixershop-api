@@ -73,6 +73,7 @@ export class Customer extends AggregateRoot {
     customer.apply(
       new CustomerRegisteredEvent({
         customerId: id.value,
+        currency: preferences.currency,
         email: email.value,
         firstName,
       }),

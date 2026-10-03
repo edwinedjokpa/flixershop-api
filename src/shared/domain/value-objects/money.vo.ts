@@ -34,9 +34,10 @@ export class Money {
     units: bigint | string | number,
     currency: string,
   ): Money {
+    const cur = Currency.create(currency);
     return new Money(
-      new Decimal(units.toString()).div(100),
-      Currency.create(currency),
+      new Decimal(units.toString()).div(cur.minorUnitMultiplier.toString()),
+      cur,
     );
   }
 
@@ -93,11 +94,25 @@ export class Money {
   }
 
   toMinorUnits(): bigint {
-    return BigInt(this._amount.mul(100).toFixed(0));
+    return BigInt(
+      this._amount
+        .mul(this._currency.minorUnitMultiplier.toString())
+        .toFixed(0),
+    );
+  }
+
+  formatAmount(): string {
+    const value = this._amount.toFixed(this._currency.decimalDigits);
+    const [integerPart, fractionalPart] = value.split('.');
+
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return fractionalPart
+      ? `${formattedInteger}.${fractionalPart}`
+      : formattedInteger;
   }
 
   toString(): string {
-    return `${this._amount.toFixed(2)} ${this._currency}`;
+    return `${this._amount.toFixed(2)} ${this._currency.value}`;
   }
 
   get amount(): Decimal {

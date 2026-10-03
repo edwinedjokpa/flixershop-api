@@ -8,11 +8,11 @@ import {
   PaymentWebhookResult,
 } from '../../application/ports/payment-gateway.port.js';
 import { InvalidPaymentWebhookException } from '../../domain/exceptions/payment-gateway.exception.js';
-import { PaymentProviderName } from '../../domain/constants/payment-provider.constants.js';
+import { PaymentProviderName } from '../../domain/constants/payment.constants.js';
 
 @Injectable()
 export class StripePaymentGateway implements PaymentGateway {
-  readonly provider = PaymentProviderName.Stripe;
+  readonly provider: PaymentProviderName = 'stripe';
 
   private readonly stripe: Stripe;
   private readonly webhookSecret: string;

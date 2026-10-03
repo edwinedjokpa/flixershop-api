@@ -33,5 +33,6 @@ const isProduction = appConfig.nodeEnv === 'production';
       },
     }),
   ],
+  exports: [],
 })
 export class LoggingModule {}

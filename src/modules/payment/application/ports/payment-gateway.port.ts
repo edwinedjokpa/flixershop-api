@@ -1,5 +1,5 @@
 import { Money } from '@/shared/domain/value-objects/money.vo.js';
-import { PaymentProviderName } from '../../domain/constants/payment-provider.constants.js';
+import { PaymentProviderName } from '../../domain/constants/payment.constants.js';
 
 export interface PaymentCheckoutResult {
   url: string;

@@ -1,18 +1,24 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsEmail,
+  IsISO4217CurrencyCode,
   IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
   IsString,
+  Matches,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
 
 class PreferencesDto {
+  @Transform(({ value }) => value?.trim().toUpperCase())
   @IsString()
   @IsNotEmpty()
-  @MaxLength(3)
+  @Matches(/^[A-Z]{3}$/, {
+    message: 'currency must be a 3-letter uppercase currency code',
+  })
+  @IsISO4217CurrencyCode()
   currency: string;
 }
 

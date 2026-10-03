@@ -3,7 +3,7 @@ export class ProductResponseDto {
   name: string;
   description: string;
   sku: string;
-  basePrice: number;
+  basePrice: string;
   currency: string;
   stock: number;
   isActive: boolean;

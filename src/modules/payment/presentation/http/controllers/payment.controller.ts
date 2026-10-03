@@ -3,7 +3,6 @@ import { Body, Controller, Headers, Post, RawBody } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreatePaymentDto } from '../dto/create-payment.dto.js';
 import { ProcessWebhookCommand } from '@/modules/payment/application/commands/process-webhook/process-webhook.command.js';
-import { PaymentProviderName } from '@/modules/payment/domain/constants/payment-provider.constants.js';
 
 @Controller({ path: 'payments' })
 export class PaymentController {
@@ -28,7 +27,7 @@ export class PaymentController {
   ) {
     await this.commandBus.execute(
       new ProcessWebhookCommand({
-        provider: PaymentProviderName.Stripe,
+        provider: 'stripe',
         payload,
         signature,
       }),
@@ -44,7 +43,23 @@ export class PaymentController {
   ) {
     await this.commandBus.execute(
       new ProcessWebhookCommand({
-        provider: PaymentProviderName.Paystack,
+        provider: 'paystack',
+        payload,
+        signature,
+      }),
+    );
+
+    return { received: true };
+  }
+
+  @Post('webhooks/monnify')
+  async handleMonnifyWebhook(
+    @RawBody() payload: Buffer,
+    @Headers('monnify-signature') signature: string,
+  ) {
+    await this.commandBus.execute(
+      new ProcessWebhookCommand({
+        provider: 'monnify',
         payload,
         signature,
       }),

@@ -1,4 +1,4 @@
-import { PaymentProviderName } from '@/modules/payment/domain/constants/payment-provider.constants.js';
+import { PaymentProviderName } from '@/modules/payment/domain/constants/payment.constants.js';
 
 interface ProcessWebhookCommandProps {
   provider: PaymentProviderName;

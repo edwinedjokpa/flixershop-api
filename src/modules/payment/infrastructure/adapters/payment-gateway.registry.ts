@@ -4,7 +4,7 @@ import { PaystackPaymentGateway } from '../gateways/paystack.gateway.js';
 import { PaymentGateway } from '../../application/ports/payment-gateway.port.js';
 import { UnsupportedPaymentProviderException } from '../../domain/exceptions/payment-gateway.exception.js';
 import { PaymentGatewayRegistryPort } from '../../application/ports/payment-gateway-registry.port.js';
-import { PaymentProviderName } from '../../domain/constants/payment-provider.constants.js';
+import { PaymentProviderName } from '../../domain/constants/payment.constants.js';
 import { MonnifyPaymentGateway } from '../gateways/monnify.gateway.js';
 
 @Injectable()
@@ -17,11 +17,11 @@ export class PaymentGatewayRegistry implements PaymentGatewayRegistryPort {
 
   get(provider: PaymentProviderName): PaymentGateway {
     switch (provider) {
-      case PaymentProviderName.Stripe:
+      case 'stripe':
         return this.stripe;
-      case PaymentProviderName.Paystack:
+      case 'paystack':
         return this.paystack;
-      case PaymentProviderName.Monnify:
+      case 'monnify':
         return this.monnify;
       default:
         throw new UnsupportedPaymentProviderException(provider);

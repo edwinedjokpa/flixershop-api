@@ -1,40 +1,27 @@
 import {
+  ORDER_STATUSES,
+  OrderStatusName,
+} from '../constants/order.constants.js';
+import {
   InvalidOrderStatusException,
   InvalidOrderStatusTransitionException,
 } from '../exceptions/order.exception.js';
 
-export const OrderStatusValue = {
-  PENDING: 'pending',
-  CANCELLED: 'cancelled',
-  CONFIRMED: 'confirmed',
-  SHIPPED: 'shipped',
-  DELIVERED: 'delivered',
-} as const;
-
-export type OrderStatusValue =
-  (typeof OrderStatusValue)[keyof typeof OrderStatusValue];
-
 export class OrderStatus {
   private static readonly VALID_TRANSITIONS: Record<
-    OrderStatusValue,
-    OrderStatusValue[]
+    OrderStatusName,
+    OrderStatusName[]
   > = {
-    [OrderStatusValue.PENDING]: [
-      OrderStatusValue.CONFIRMED,
-      OrderStatusValue.CANCELLED,
-    ],
-    [OrderStatusValue.CONFIRMED]: [
-      OrderStatusValue.SHIPPED,
-      OrderStatusValue.CANCELLED,
-    ],
-    [OrderStatusValue.SHIPPED]: [OrderStatusValue.DELIVERED],
-    [OrderStatusValue.DELIVERED]: [],
-    [OrderStatusValue.CANCELLED]: [],
+    pending: ['confirmed', 'cancelled'],
+    confirmed: ['shipped', 'cancelled'],
+    shipped: ['delivered'],
+    delivered: [],
+    cancelled: [],
   };
 
-  private readonly _value: OrderStatusValue;
+  private readonly _value: OrderStatusName;
 
-  private constructor(value: OrderStatusValue) {
+  private constructor(value: OrderStatusName) {
     this._value = value;
   }
 
@@ -59,19 +46,14 @@ export class OrderStatus {
   }
 
   static fromString(value: string): OrderStatus {
-    const valid: OrderStatusValue[] = [
-      'pending',
-      'confirmed',
-      'shipped',
-      'delivered',
-      'cancelled',
-    ];
-
-    if (!valid.includes(value as OrderStatusValue)) {
+    if (!OrderStatus.isStatusName(value)) {
       throw new InvalidOrderStatusException(value);
     }
+    return new OrderStatus(value);
+  }
 
-    return new OrderStatus(value as OrderStatusValue);
+  private static isStatusName(value: string): value is OrderStatusName {
+    return (Object.values(ORDER_STATUSES) as readonly string[]).includes(value);
   }
 
   canConfirm(): boolean {
@@ -114,16 +96,16 @@ export class OrderStatus {
     return this.value;
   }
 
-  get value(): OrderStatusValue {
+  get value(): OrderStatusName {
     return this._value;
   }
 
-  private canTransitionTo(target: OrderStatusValue): boolean {
+  private canTransitionTo(target: OrderStatusName): boolean {
     const allowed = OrderStatus.VALID_TRANSITIONS[this.value];
     return allowed.includes(target);
   }
 
-  private transitionTo(target: OrderStatusValue): OrderStatus {
+  private transitionTo(target: OrderStatusName): OrderStatus {
     if (!this.canTransitionTo(target)) {
       throw new InvalidOrderStatusTransitionException({
         currentStatus: this.value,

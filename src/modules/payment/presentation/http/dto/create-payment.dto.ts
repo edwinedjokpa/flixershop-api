@@ -1,11 +1,14 @@
-import { PaymentProviderName } from '@/modules/payment/domain/constants/payment-provider.constants.js';
+import {
+  PAYMENT_PROVIDERS,
+  type PaymentProviderName,
+} from '@/modules/payment/domain/constants/payment.constants.js';
 import { IsEnum, IsOptional, IsUrl, IsUUID } from 'class-validator';
 
 export class CreatePaymentDto {
   @IsUUID()
   orderId: string;
 
-  @IsEnum(PaymentProviderName)
+  @IsEnum(PAYMENT_PROVIDERS)
   provider: PaymentProviderName;
 
   @IsOptional()

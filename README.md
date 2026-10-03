@@ -1,6 +1,6 @@
 # Flixer Shop API
 
-A NestJS e-commerce backend that demonstrates Clean Architecture, Domain-Driven Design (DDD), CQRS, domain events, and ports/adapters. It manages customers, products, orders, and checkout payments while keeping business rules independent of HTTP, databases, email, and payment providers.
+A NestJS e-commerce backend that demonstrates Clean Architecture, Domain-Driven Design (DDD), CQRS, domain events, and ports/adapters. It manages customers, wallets, products, orders, and checkout payments while keeping business rules independent of HTTP, databases, email, and payment providers.
 
 It supports MongoDB or PostgreSQL persistence at runtime. PostgreSQL uses Drizzle ORM and migrations; MongoDB uses the native MongoDB driver. Redis caches exchange rates and Monnify access tokens.
 
@@ -19,6 +19,7 @@ It supports MongoDB or PostgreSQL persistence at runtime. PostgreSQL uses Drizzl
 ## Capabilities
 
 - Register, search, retrieve, and delete customers.
+- Automatically provision and manage customer wallets by currency.
 - Create, search, retrieve, and delete products.
 - Place orders in a customer's preferred currency, converting product prices when necessary.
 - Move orders through `pending → confirmed → shipped → delivered`, or cancel while pending/confirmed.
@@ -123,7 +124,7 @@ pnpm db:push
 pnpm db:studio
 ```
 
-The initial migration creates `customers`, `products`, `orders`, `order_items`, and `payments`, plus order/payment status enums and foreign keys. MongoDB collections are created on first write; this repository does not define MongoDB indexes or migrations.
+The PostgreSQL schema includes `customers`, `wallets`, `products`, `orders`, `order_items`, and `payments`, plus order/payment/wallet status enums and foreign keys. MongoDB collections are created on first write; the wallet repository creates a unique customer-and-currency index at module initialization.
 
 Money is stored internally in minor units (for example, `1099` for `10.99`) in both persistence implementations. API product prices are numbers; order monetary fields in response DTOs are strings to preserve exact decimal values.
 
@@ -150,6 +151,7 @@ HTTP controller / DTO / mapper
 | Module     | Aggregate / responsibility                                  | Key ports and adapters                                                                  |
 | ---------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `customer` | Customer profile, email, preferences                        | Customer repository: MongoDB or Drizzle                                                 |
+| `wallet`   | Customer funds, currency, balance, lifecycle                | Wallet repository: MongoDB or Drizzle; optimistic concurrency control                   |
 | `product`  | Catalog product, SKU, price, stock state                    | Product repository: MongoDB or Drizzle                                                  |
 | `order`    | Order, items, shipping address, status                      | Order repository; customer/product lookups; exchange-rate adapter                       |
 | `payment`  | Payment state and checkout                                  | Payment repository; Stripe, Paystack, Monnify registry; order-pricing/customer adapters |
@@ -212,7 +214,20 @@ POST /customers
 }
 ```
 
-`email`, `firstName`, `lastName`, and `preferences.currency` are required. The domain normalizes/validates currency as a three-letter uppercase code. Duplicate email addresses are rejected.
+`email`, `firstName`, `lastName`, and `preferences.currency` are required. The domain normalizes/validates currency as a three-letter uppercase code. Duplicate email addresses are rejected. Registration also raises a domain event that opens an active, zero-balance wallet in the customer's preferred currency.
+
+### Wallets
+
+Wallet endpoints are customer-scoped. Send the `X-Customer-Id` request header with the authenticated customer's UUID; without it, the API returns `CUSTOMER_ID_REQUIRED` (400).
+
+| Method and path           | Header/body                              | Status | Description                                                         |
+| ------------------------- | ---------------------------------------- | ------ | ------------------------------------------------------------------- |
+| `POST /wallets`           | `X-Customer-Id`; `{ "currency": "NGN" }` | 201    | Opens a wallet for that currency, or reopens a closed empty wallet. |
+| `GET /wallets`            | `X-Customer-Id`                          | 200    | Lists the customer's wallets.                                       |
+| `GET /wallets/:id`        | `X-Customer-Id`                          | 200    | Retrieves a wallet only when it belongs to that customer.           |
+| `POST /wallets/:id/close` | `X-Customer-Id`                          | 204    | Closes a zero-balance active or frozen wallet.                      |
+
+Each customer can have one wallet per currency. A wallet begins `active` with a zero balance. It may transition `active → frozen → active` or `active|frozen → closed`; closed wallets can be reopened by a later `POST /wallets` request. Credits are allowed for active/frozen wallets, debits only for active wallets, and a non-zero wallet cannot be closed. The current HTTP controller exposes opening, listing, retrieval, and closing; balance mutation and freeze/unfreeze commands are application-level handlers, not public HTTP routes yet.
 
 ### Products
 
@@ -240,7 +255,7 @@ POST /products
 
 | Method and path             | Body/query                                    | Status | Description                                                       |
 | --------------------------- | --------------------------------------------- | ------ | ----------------------------------------------------------------- |
-| `POST /orders`              | Order body                                    | 201    | Places a pending order.                                           |
+| `POST /orders`              | `X-Customer-Id` header and order body         | 201    | Places a pending order for the header's customer.                 |
 | `GET /orders`               | `orderId`, `customerId`, `search`, `statuses` | 200    | Lists orders. `statuses` accepts a comma-separated list or array. |
 | `GET /orders/:id`           | —                                             | 200    | Retrieves an order.                                               |
 | `PATCH /orders/:id/confirm` | —                                             | 202    | Confirms a pending order.                                         |
@@ -251,7 +266,6 @@ POST /products
 ```json
 POST /orders
 {
-  "customerId": "00000000-0000-4000-8000-000000000001",
   "items": [
     {
       "productId": "00000000-0000-4000-8000-000000000002",
@@ -268,7 +282,7 @@ POST /orders
 }
 ```
 
-`items` must contain at least one item and each quantity must be at least one. The order uses its customer's preference currency; products priced in another currency are converted through ExchangeRate-API and cached for one hour. `search` applies to order notes and tracking number.
+Send `X-Customer-Id: 00000000-0000-4000-8000-000000000001` with the request. `items` must contain at least one item and each quantity must be at least one. The order uses its customer's preference currency; products priced in another currency are converted through ExchangeRate-API and cached for one hour. `search` applies to order notes and tracking number.
 
 Allowed transitions:
 
@@ -285,6 +299,7 @@ pending ──► confirmed ──► shipped ──► delivered
 | `POST /payments`                   | `{ "orderId", "provider", "successUrl?", "cancelUrl?" }` | Starts checkout and returns payment ID plus checkout URL. Provider: `stripe`, `paystack`, or `monnify`. |
 | `POST /payments/webhooks/stripe`   | Raw body and `stripe-signature`                          | Verifies and processes a Stripe event.                                                                  |
 | `POST /payments/webhooks/paystack` | Raw body and `x-paystack-signature`                      | Verifies and processes a Paystack event.                                                                |
+| `POST /payments/webhooks/monnify`  | Raw body and `monnify-signature`                         | Verifies and processes a Monnify event.                                                                 |
 
 ```json
 POST /payments
@@ -308,7 +323,7 @@ Example checkout response:
 }
 ```
 
-The `successUrl` and `cancelUrl` request properties are validated but not consumed by the current gateways; redirect URLs come from provider environment variables. Monnify has webhook verification in its gateway adapter, but this version does not expose `POST /payments/webhooks/monnify`.
+The `successUrl` and `cancelUrl` request properties are validated but not consumed by the current gateways; redirect URLs come from provider environment variables.
 
 ## Order and payment lifecycle
 
@@ -366,6 +381,8 @@ The e2e test initializes the full `AppModule`, so it needs the same live infrast
 
 - Domain events are handled in-process through `@nestjs/cqrs`; there is no outbox, message broker, retry queue, or asynchronous worker.
 - Registration and order lifecycle notifications use SMTP synchronously in event handlers.
+- Wallet creation uses a unique customer/currency constraint and optimistic concurrency checks in both persistence adapters.
+- Supported application currencies are `NGN`, `USD`, `EUR`, `GBP`, `CAD`, `AUD`, `JPY`, `KRW`, `KWD`, and `BHD`; minor-unit precision follows each currency's configured decimal digits.
 - Products store `stock` and a low-stock threshold, but placing an order does not currently reserve/decrement stock or reject insufficient stock.
 - Order items persist product name and price snapshots, so later product changes do not alter existing order totals.
 - Pagination, authentication, authorization, rate limiting, CORS configuration, health endpoints, and OpenAPI docs are not implemented here.

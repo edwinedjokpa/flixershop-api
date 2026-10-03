@@ -41,9 +41,6 @@ export class ShippingAddressDto {
 }
 
 export class PlaceOrderDto {
-  @IsUUID()
-  customerId: string;
-
   @IsArray()
   @ValidateNested({ each: true })
   @ArrayMinSize(1)

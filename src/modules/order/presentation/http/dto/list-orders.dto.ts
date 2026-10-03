@@ -1,6 +1,9 @@
 import { IsArray, IsOptional, IsString, IsUUID, IsEnum } from 'class-validator';
-import { OrderStatusValue } from '@/modules/order/domain/value-objects/order-status.vo.js';
 import { TransformToArray } from '@/common/transformers/tranform-to-array.transformer.js';
+import {
+  ORDER_STATUSES,
+  OrderStatusName,
+} from '@/modules/order/domain/constants/order.constants.js';
 
 export class ListOrdersDto {
   @IsOptional()
@@ -18,6 +21,6 @@ export class ListOrdersDto {
   @IsOptional()
   @TransformToArray()
   @IsArray()
-  @IsEnum(OrderStatusValue, { each: true })
-  statuses?: OrderStatusValue[];
+  @IsEnum(ORDER_STATUSES, { each: true })
+  statuses?: OrderStatusName[];
 }

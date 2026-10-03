@@ -21,6 +21,17 @@ interface CurrencyExchangeProviderExceptionDetails {
   errorType: string;
 }
 
+export class UnsupportedCurrencyException extends DomainException {
+  constructor(value: string) {
+    super({
+      code: 'UNSUPPORTED_CURRENCY',
+      message: `Unsupported currency: ${value}.`,
+      details: {
+        value,
+      },
+    });
+  }
+}
 export class InvalidCurrencyException extends DomainException {
   constructor(value: string) {
     super({

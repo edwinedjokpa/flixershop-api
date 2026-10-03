@@ -17,7 +17,7 @@ import {
   InvalidPaymentWebhookException,
   PaymentGatewayException,
 } from '../../domain/exceptions/payment-gateway.exception.js';
-import { PaymentProviderName } from '../../domain/constants/payment-provider.constants.js';
+import { PaymentProviderName } from '../../domain/constants/payment.constants.js';
 
 interface MonnifyResponse<T> {
   requestSuccessful: boolean;
@@ -68,7 +68,7 @@ interface MonnifyWebhookEvent {
 
 @Injectable()
 export class MonnifyPaymentGateway implements PaymentGateway {
-  readonly provider = PaymentProviderName.Monnify;
+  readonly provider: PaymentProviderName = 'monnify';
 
   private readonly apiURL: string;
   private readonly apiKey: string;

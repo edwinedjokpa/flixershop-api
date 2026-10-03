@@ -14,7 +14,7 @@ import {
   InvalidPaymentWebhookException,
   PaymentGatewayException,
 } from '../../domain/exceptions/payment-gateway.exception.js';
-import { PaymentProviderName } from '../../domain/constants/payment-provider.constants.js';
+import { PaymentProviderName } from '../../domain/constants/payment.constants.js';
 
 interface PaystackInitializePayload {
   email: string;
@@ -50,7 +50,7 @@ interface PaystackWebhookEvent {
 
 @Injectable()
 export class PaystackPaymentGateway implements PaymentGateway {
-  readonly provider = PaymentProviderName.Paystack;
+  readonly provider: PaymentProviderName = 'paystack';
 
   private readonly apiURL: string;
   private readonly secretKey: string;

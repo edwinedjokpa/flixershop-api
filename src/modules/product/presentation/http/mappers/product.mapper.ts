@@ -8,7 +8,7 @@ export class ProductMapper {
       name: product.name,
       description: product.description,
       sku: product.sku.value,
-      basePrice: product.basePrice.amount.toNumber(),
+      basePrice: product.basePrice.formatAmount(),
       currency: product.basePrice.currency.toString(),
       stock: product.stock,
       isActive: product.isActive,

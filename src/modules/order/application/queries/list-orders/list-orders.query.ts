@@ -1,10 +1,10 @@
-import { OrderStatusValue } from '@/modules/order/domain/value-objects/order-status.vo.js';
+import { OrderStatusName } from '@/modules/order/domain/constants/order.constants.js';
 
 interface ListOrdersQueryProps {
   orderId?: string;
   customerId?: string;
   search?: string;
-  statuses?: OrderStatusValue[];
+  statuses?: OrderStatusName[];
 }
 
 export class ListOrdersQuery {

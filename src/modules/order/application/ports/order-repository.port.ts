@@ -1,6 +1,6 @@
+import { OrderStatusName } from '../../domain/constants/order.constants.js';
 import { Order } from '../../domain/entities/order.entity.js';
 import { OrderId } from '../../domain/value-objects/order-id.vo.js';
-import { OrderStatusValue } from '../../domain/value-objects/order-status.vo.js';
 
 export const ORDER_REPOSITORY = Symbol('ORDER_REPOSITORY');
 
@@ -8,7 +8,7 @@ export interface OrderFilters {
   orderId?: string;
   customerId?: string;
   search?: string;
-  statuses?: OrderStatusValue[];
+  statuses?: OrderStatusName[];
 }
 
 export interface OrderRepository {

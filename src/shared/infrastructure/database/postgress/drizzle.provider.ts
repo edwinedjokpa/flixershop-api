@@ -1,12 +1,13 @@
 import { Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { sql } from 'drizzle-orm';
-import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import postgres from 'postgres';
 import * as schema from './schema/index.js';
 
 export const DRIZZLE = Symbol('DRIZZLE');
-export type DrizzleDB = PostgresJsDatabase<typeof schema>;
+export type DrizzleDB = NodePgDatabase<typeof schema>;
 
 export const DrizzleProvider: Provider = {
   provide: DRIZZLE,
